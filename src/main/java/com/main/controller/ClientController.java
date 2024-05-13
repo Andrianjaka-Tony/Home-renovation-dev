@@ -160,4 +160,21 @@ public class ClientController {
     }
   }
 
+  @GetMapping(value = "/api/client-contracts/{contact}", produces = "application/json")
+  public Response findAllByContracts(@PathVariable(name = "contact") String contact) {
+    Connection connection = Connect.getConnection();
+    try {
+      Client client = new Client();
+      client.setContact(contact);
+      Response response = new Response(200, "CLIENT-CONTRACT list");
+      response.add("array", ClientContract.findAllByClient(connection, client));
+      return response;
+    } catch (Exception e) {
+      Response response = new Response(403, e.getMessage());
+      return response;
+    } finally {
+      Connect.close(connection);
+    }
+  }
+
 }

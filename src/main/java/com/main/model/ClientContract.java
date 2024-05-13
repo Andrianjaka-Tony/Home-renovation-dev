@@ -7,7 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,6 +32,9 @@ public class ClientContract {
   private House house;
   private FinishingType finishingType;
   private Double finishingAugmentation;
+  private Double price;
+  private Double payed;
+  private List<ContractDetails> details;
 
   public String nextId(Connection connection)
       throws SQLException {
@@ -106,6 +111,8 @@ public class ClientContract {
     clientcontract.setEnd(resultSet.getTimestamp("_end"));
     clientcontract.setDate(resultSet.getDate("_date"));
     clientcontract.setFinishingAugmentation(resultSet.getDouble("_finishing_augmentation"));
+    clientcontract.setPrice(resultSet.getDouble("_price"));
+    clientcontract.setPayed(resultSet.getDouble("_payed"));
 
     Client client = new Client();
     client.setId(resultSet.getString("_client_id"));
@@ -141,6 +148,7 @@ public class ClientContract {
     }
     statement.close();
     resultSet.close();
+    response.setDetails(ContractDetails.findAllByContract(connection, response));
     return response;
   }
 
@@ -148,6 +156,21 @@ public class ClientContract {
       throws SQLException {
     List<ClientContract> response = new ArrayList<>();
     String sql = "SELECT * FROM _v_main_client_contract";
+    PreparedStatement statement = connection.prepareStatement(sql);
+    ResultSet resultSet = statement.executeQuery();
+    while (resultSet.next()) {
+      ClientContract clientcontract = createFromResultSet(connection, resultSet);
+      response.add(clientcontract);
+    }
+    statement.close();
+    resultSet.close();
+    return response;
+  }
+
+  public static List<ClientContract> findAllCurrent(Connection connection)
+      throws SQLException {
+    List<ClientContract> response = new ArrayList<>();
+    String sql = "SELECT * FROM _v_current_client_contract";
     PreparedStatement statement = connection.prepareStatement(sql);
     ResultSet resultSet = statement.executeQuery();
     while (resultSet.next()) {
@@ -189,6 +212,37 @@ public class ClientContract {
     }
     statement.close();
     resultSet.close();
+    return response;
+  }
+
+  public static Double totalPrice(Connection connection)
+      throws SQLException {
+    Double response = null;
+    String sql = "SELECT _price FROM _v_client_contract_total_price";
+    PreparedStatement statement = connection.prepareStatement(sql);
+    ResultSet resultSet = statement.executeQuery();
+    while (resultSet.next()) {
+      response = resultSet.getDouble("_price");
+    }
+    statement.close();
+    resultSet.close();
+    return response;
+  }
+
+  public static List<Map<String, Object>> histogram(Connection connection)
+      throws SQLException {
+    List<Map<String, Object>> response = new ArrayList<>();
+    String sql = "SELECT _month_year AS _date, _price FROM _v_client_contract_amount_month_year";
+    PreparedStatement statement = connection.prepareStatement(sql);
+    ResultSet resultSet = statement.executeQuery();
+    while (resultSet.next()) {
+      Map<String, Object> map = new HashMap<>();
+      map.put("date", resultSet.getString("_date"));
+      map.put("price", resultSet.getString("_price"));
+      response.add(map);
+    }
+    resultSet.close();
+    statement.close();
     return response;
   }
 

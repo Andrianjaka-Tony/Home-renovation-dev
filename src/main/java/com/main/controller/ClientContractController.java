@@ -95,7 +95,7 @@ public class ClientContractController {
     Connection connection = Connect.getConnection();
     try {
       Response response = new Response(200, "CLIENT-CONTRACT found");
-      response.add("client-contract", ClientContract.findById(connection, id));
+      response.add("contract", ClientContract.findById(connection, id));
       return response;
     } catch (Exception e) {
       Response response = new Response(403, e.getMessage());
@@ -120,14 +120,12 @@ public class ClientContractController {
     }
   }
 
-  @GetMapping(value = "/api/client-contracts/{contact}", produces = "application/json")
-  public Response findAllByClient(@PathVariable(name = "contact") String contact) {
+  @GetMapping(value = "/api/client-contracts/current", produces = "application/json")
+  public Response findAllCurrent() {
     Connection connection = Connect.getConnection();
     try {
-      Client client = new Client();
-      client.setContact(contact);
       Response response = new Response(200, "CLIENT-CONTRACT list");
-      response.add("array", ClientContract.findAllByClient(connection, client));
+      response.add("array", ClientContract.findAllCurrent(connection));
       return response;
     } catch (Exception e) {
       Response response = new Response(403, e.getMessage());

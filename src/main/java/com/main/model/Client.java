@@ -25,6 +25,7 @@ public class Client {
   private String id;
   private String name;
   private String contact;
+  private List<ClientContract> contracts;
 
   public String nextId(Connection connection)
       throws SQLException {
@@ -162,7 +163,7 @@ public class Client {
     contract.save(connection);
     for (HouseDetails detail : HouseDetails.findAllByHouse(connection, contract.getHouse())) {
       ContractDetails contractDetails = new ContractDetails(null, detail.getQuantity(), detail.getWork().getPrice(),
-          detail.getWork(), contract);
+          detail.getWork(), contract, null);
       contractDetails.save(connection);
     }
   }

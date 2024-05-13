@@ -25,6 +25,7 @@ public class ContractDetails {
   private Double unitPrice;
   private Work work;
   private ClientContract contract;
+  private Unit unit;
 
   public String nextId(Connection connection)
       throws SQLException {
@@ -98,6 +99,10 @@ public class ContractDetails {
     contract.setId(resultSet.getString("_contract"));
     contractdetails.setContract(contract);
 
+    Unit unit = new Unit();
+    unit.setName(resultSet.getString("_unit_name"));
+    contractdetails.setUnit(unit);
+
     return contractdetails;
   }
 
@@ -122,6 +127,22 @@ public class ContractDetails {
     List<ContractDetails> response = new ArrayList<>();
     String sql = "SELECT * FROM _v_main_contract_details";
     PreparedStatement statement = connection.prepareStatement(sql);
+    ResultSet resultSet = statement.executeQuery();
+    while (resultSet.next()) {
+      ContractDetails contractdetails = createFromResultSet(connection, resultSet);
+      response.add(contractdetails);
+    }
+    statement.close();
+    resultSet.close();
+    return response;
+  }
+
+  public static List<ContractDetails> findAllByContract(Connection connection, ClientContract contract)
+      throws SQLException {
+    List<ContractDetails> response = new ArrayList<>();
+    String sql = "SELECT * FROM _v_main_contract_details WHERE _contract = ?";
+    PreparedStatement statement = connection.prepareStatement(sql);
+    statement.setString(1, contract.getId());
     ResultSet resultSet = statement.executeQuery();
     while (resultSet.next()) {
       ContractDetails contractdetails = createFromResultSet(connection, resultSet);

@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.springframework.core.io.ClassPathResource;
 
+import com.main.helper.Connect;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 
@@ -84,14 +85,25 @@ public class PaymentTemp {
     resultSet.close();
   }
 
+  public void savePayment(Connection connection)
+      throws SQLException {
+    ClientPayment payment = ClientPayment.builder()
+        .id(getPayment())
+        .contract(ClientContract.findById(connection, getContract()))
+        .date(Connect.convertToSqlDate(getDate()))
+        .amount(getAmount())
+        .build();
+    payment.saveFromCSV(connection);
+  }
+
   public static void save(Connection connection, String filePath)
       throws SQLException {
     List<PaymentTemp> paymentTemps = extract(filePath);
     for (PaymentTemp payment : paymentTemps) {
-      payment.save(connection);
-      System.out.println(payment);
+      // payment.save(connection);
+      payment.savePayment(connection);
     }
-    savePayments(connection);
+    // savePayments(connection);
   }
 
 }

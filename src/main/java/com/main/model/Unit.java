@@ -98,6 +98,22 @@ public class Unit {
     return response;
   }
 
+  public static Unit findByName(Connection connection, String name)
+      throws SQLException {
+    Unit response = null;
+    String sql = "SELECT * FROM _unit WHERE _name = ?";
+    PreparedStatement statement = connection.prepareStatement(sql);
+    statement.setString(1, name);
+    ResultSet resultSet = statement.executeQuery();
+    while (resultSet.next()) {
+      Unit unit = createFromResultSet(connection, resultSet);
+      response = unit;
+    }
+    statement.close();
+    resultSet.close();
+    return response;
+  }
+
   public static List<Unit> findAll(Connection connection)
       throws SQLException {
     List<Unit> response = new ArrayList<>();

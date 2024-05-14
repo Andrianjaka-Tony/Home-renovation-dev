@@ -81,12 +81,13 @@ public class HouseWork {
       throws SQLException {
     List<HouseWork> data = extract(filePath);
     for (HouseWork houseWork : data) {
-      houseWork.save(connection);
+      // houseWork.save(connection);
+      houseWork.process(connection);
     }
-    saveUnits(connection);
-    saveWorks(connection);
-    saveHouses(connection);
-    saveDetails(connection);
+    // saveUnits(connection);
+    // saveWorks(connection);
+    // saveHouses(connection);
+    // saveDetails(connection);
   }
 
   public static void saveUnits(Connection connection)
@@ -160,6 +161,60 @@ public class HouseWork {
     }
     statement.close();
     resultSet.close();
+  }
+
+  void saveUnit(Connection connection)
+      throws SQLException {
+    Unit unit = Unit.findByName(connection, getUnitName());
+    if (unit == null) {
+      unit = Unit.builder().name(getUnitName()).build();
+      unit.save(connection);
+    }
+  }
+
+  void saveWork(Connection connection)
+      throws SQLException {
+    Work work = Work.findById(connection, getWorkId());
+    if (work == null) {
+      work = Work.builder()
+          .id(getWorkId())
+          .name(getWorkName())
+          .price(getUnitPrice())
+          .unit(Unit.findByName(connection, getUnitName()))
+          .parent(Work.builder().id(null).build())
+          .build();
+      work.saveWIthoutSettingId(connection);
+    }
+  }
+
+  void saveHouse(Connection connection) throws SQLException {
+    House house = House.findByName(connection, getHouse());
+    if (house == null) {
+      house = House.builder()
+          .name(getHouse())
+          .description(getDescription())
+          .duration(getDuration())
+          .area(getArea())
+          .build();
+      house.save(connection);
+    }
+  }
+
+  void saveHouseDetails(Connection connection) throws SQLException {
+    HouseDetails detail = HouseDetails.builder()
+        .quantity(getQuantity())
+        .house(House.findByName(connection, getHouse()))
+        .work(Work.findById(connection, getWorkId()))
+        .build();
+    detail.save(connection);
+  }
+
+  void process(Connection connection)
+      throws SQLException {
+    saveUnit(connection);
+    saveWork(connection);
+    saveHouse(connection);
+    saveHouseDetails(connection);
   }
 
 }

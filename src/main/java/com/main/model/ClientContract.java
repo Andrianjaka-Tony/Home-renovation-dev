@@ -275,4 +275,37 @@ public class ClientContract {
     return response;
   }
 
+  public static List<String> histogramYears(Connection connection)
+      throws SQLException {
+    List<String> response = new ArrayList<>();
+    String sql = "SELECT _year FROM _v_client_contract_year";
+    PreparedStatement statement = connection.prepareStatement(sql);
+    ResultSet resultSet = statement.executeQuery();
+    while (resultSet.next()) {
+      response.add(resultSet.getString("_year"));
+    }
+    resultSet.close();
+    statement.close();
+    return response;
+  }
+
+  public static List<Map<String, Object>> histogramByYear(Connection connection, String year)
+      throws SQLException {
+    List<Map<String, Object>> response = new ArrayList<>();
+    String sql = "SELECT _month_year AS _date, _price FROM _v_client_contract_amount_month_year WHERE _month_year like '"
+        + year + "%' ORDER BY _month_year ASC";
+    PreparedStatement statement = connection.prepareStatement(sql);
+    // statement.setString(1, year);
+    ResultSet resultSet = statement.executeQuery();
+    while (resultSet.next()) {
+      Map<String, Object> map = new HashMap<>();
+      map.put("date", resultSet.getString("_date"));
+      map.put("price", resultSet.getString("_price"));
+      response.add(map);
+    }
+    resultSet.close();
+    statement.close();
+    return response;
+  }
+
 }

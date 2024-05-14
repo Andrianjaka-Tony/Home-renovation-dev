@@ -13,6 +13,7 @@ import java.util.List;
 import org.springframework.core.io.ClassPathResource;
 
 import com.main.exception.ClientException;
+import com.main.helper.Connect;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 
@@ -82,11 +83,12 @@ public class ContractCSV {
     List<ContractCSV> data = extract(filePath);
     for (ContractCSV row : data) {
       row.save(connection);
-      Client client = Client.builder().contact(row.getClient()).build();
-      client.signIn(connection);
+      row.process(connection);
+      // Client client = Client.builder().contact(row.getClient()).build();
+      // client.signIn(connection);
     }
-    saveLocations(connection);
-    saveContracts(connection);
+    // saveLocations(connection);
+    // saveContracts(connection);
   }
 
   public static void saveLocations(Connection connection)
@@ -130,6 +132,42 @@ public class ContractCSV {
 
       client.beginContractCSV(connection, contract);
     }
+  }
+
+  public void saveClient(Connection connection)
+      throws SQLException {
+    Client client = Client.builder().contact(getClient()).build();
+    client.signIn(connection);
+  }
+
+  public void saveLocation(Connection connection)
+      throws SQLException {
+    Location location = Location.findByName(connection, getLocation());
+    if (location == null) {
+      location = Location.builder().name(getLocation()).build();
+      location.save(connection);
+    }
+  }
+
+  public void saveContract(Connection connection)
+      throws SQLException, ClientException {
+    ClientContract contract = ClientContract.builder()
+        .id(getId())
+        .begin(Connect.convertToSqlTimestamp(getBegin()))
+        .client(Client.findByContactWithoutException(connection, getClient()))
+        .house(House.findByName(connection, getHouse()))
+        .finishingType(FinishingType.findByName(connection, getFinishingName()))
+        .finishingAugmentation(parseDouble(getAugmentation()))
+        .location(Location.findByName(connection, getLocation()))
+        .build();
+    contract.getClient().beginContractCSV(connection, contract);
+  }
+
+  public void process(Connection connection)
+      throws SQLException, ClientException {
+    saveClient(connection);
+    saveLocation(connection);
+    saveContract(connection);
   }
 
 }

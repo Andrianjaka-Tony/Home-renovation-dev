@@ -77,7 +77,6 @@ public class Location {
     Location location = new Location();
 
     location.setId(resultSet.getString("_id"));
-
     location.setName(resultSet.getString("_name"));
 
     return location;
@@ -89,6 +88,22 @@ public class Location {
     String sql = "SELECT * FROM _location WHERE _id = ?";
     PreparedStatement statement = connection.prepareStatement(sql);
     statement.setString(1, id);
+    ResultSet resultSet = statement.executeQuery();
+    while (resultSet.next()) {
+      Location location = createFromResultSet(connection, resultSet);
+      response = location;
+    }
+    statement.close();
+    resultSet.close();
+    return response;
+  }
+
+  public static Location findByName(Connection connection, String name)
+      throws SQLException {
+    Location response = null;
+    String sql = "SELECT * FROM _location WHERE _name = ?";
+    PreparedStatement statement = connection.prepareStatement(sql);
+    statement.setString(1, name);
     ResultSet resultSet = statement.executeQuery();
     while (resultSet.next()) {
       Location location = createFromResultSet(connection, resultSet);

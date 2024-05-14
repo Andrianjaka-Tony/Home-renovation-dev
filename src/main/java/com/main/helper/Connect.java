@@ -1,7 +1,9 @@
 package com.main.helper;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -54,7 +56,10 @@ public class Connect {
 
   public static void resetDatabase(Connection connection)
       throws SQLException {
-    List<String> queries = List.of();
+    List<String> queries = List.of("DELETE FROM _user WHERE _role = 'ROLE02'", "DELETE FROM _house_work_temp",
+        "DELETE FROM _contract_temp", "DELETE FROM _contract_details", "DELETE FROM _client_payment",
+        "DELETE FROM _client_contract", "DELETE FROM _house_details", "DELETE FROM _work", "DELETE FROM _house",
+        "DELETE FROM _client", "DELETE FROM _unit", "DELETE FROM _location");
     for (String query : queries) {
       PreparedStatement statement = connection.prepareStatement(query);
       statement.execute();
@@ -90,6 +95,28 @@ public class Connect {
     statement.close();
     resultSet.close();
     return response;
+  }
+
+  public static Date convertToSqlDate(String date) {
+    try {
+      SimpleDateFormat responseFormat = new SimpleDateFormat("yyyy-MM-dd");
+      java.util.Date parsedDate = responseFormat.parse(date);
+      return new Date(parsedDate.getTime());
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+
+  public static Timestamp convertToSqlTimestamp(String timestamp) {
+    try {
+      SimpleDateFormat responseFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+      java.util.Date parsedDate = responseFormat.parse(timestamp);
+      return new Timestamp(parsedDate.getTime());
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
+    }
   }
 
 }

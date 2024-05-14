@@ -111,6 +111,22 @@ public class House {
     return response;
   }
 
+  public static House findByName(Connection connection, String name)
+      throws SQLException {
+    House response = null;
+    String sql = "SELECT * FROM _v_main_house WHERE _name = ?";
+    PreparedStatement statement = connection.prepareStatement(sql);
+    statement.setString(1, name);
+    ResultSet resultSet = statement.executeQuery();
+    while (resultSet.next()) {
+      House house = createFromResultSet(connection, resultSet);
+      response = house;
+    }
+    statement.close();
+    resultSet.close();
+    return response;
+  }
+
   public static List<House> findAll(Connection connection)
       throws SQLException {
     List<House> response = new ArrayList<>();

@@ -59,6 +59,19 @@ public class Work {
     statement.close();
   }
 
+  public void saveWIthoutSettingId(Connection connection)
+      throws SQLException {
+    String sql = "INSERT INTO _work (_id, _name, _price, _unit, _parent) VALUES (?, ?, ?, ?, ?)";
+    PreparedStatement statement = connection.prepareStatement(sql);
+    statement.setString(1, getId());
+    statement.setString(2, getName());
+    statement.setDouble(3, getPrice());
+    statement.setString(4, getUnit().getId());
+    statement.setString(5, getParent().getId());
+    statement.execute();
+    statement.close();
+  }
+
   public void saveFromCSV(Connection connection)
       throws SQLException {
     String sql = "INSERT INTO _work (_id, _name, _price, _unit) VALUES (?, ?, ?, ?)";
@@ -120,6 +133,22 @@ public class Work {
     String sql = "SELECT * FROM _v_main_work WHERE _id = ?";
     PreparedStatement statement = connection.prepareStatement(sql);
     statement.setString(1, id);
+    ResultSet resultSet = statement.executeQuery();
+    while (resultSet.next()) {
+      Work work = createFromResultSet(connection, resultSet);
+      response = work;
+    }
+    statement.close();
+    resultSet.close();
+    return response;
+  }
+
+  public static Work findByName(Connection connection, String name)
+      throws SQLException {
+    Work response = null;
+    String sql = "SELECT * FROM _v_main_work WHERE _name = ?";
+    PreparedStatement statement = connection.prepareStatement(sql);
+    statement.setString(1, name);
     ResultSet resultSet = statement.executeQuery();
     while (resultSet.next()) {
       Work work = createFromResultSet(connection, resultSet);

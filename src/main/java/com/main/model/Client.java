@@ -125,6 +125,22 @@ public class Client {
     return response;
   }
 
+  public static Client findByContactWithoutException(Connection connection, String contact)
+      throws SQLException {
+    Client response = null;
+    String sql = "SELECT * FROM _client WHERE _contact = ?";
+    PreparedStatement statement = connection.prepareStatement(sql);
+    statement.setString(1, contact);
+    ResultSet resultSet = statement.executeQuery();
+    while (resultSet.next()) {
+      Client client = createFromResultSet(connection, resultSet);
+      response = client;
+    }
+    statement.close();
+    resultSet.close();
+    return response;
+  }
+
   public static List<Client> findAll(Connection connection)
       throws SQLException {
     List<Client> response = new ArrayList<>();

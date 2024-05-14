@@ -102,6 +102,22 @@ public class FinishingType {
     return response;
   }
 
+  public static FinishingType findByName(Connection connection, String name)
+      throws SQLException {
+    FinishingType response = null;
+    String sql = "SELECT * FROM _finishing_type WHERE _name = ?";
+    PreparedStatement statement = connection.prepareStatement(sql);
+    statement.setString(1, name);
+    ResultSet resultSet = statement.executeQuery();
+    while (resultSet.next()) {
+      FinishingType finishingtype = createFromResultSet(connection, resultSet);
+      response = finishingtype;
+    }
+    statement.close();
+    resultSet.close();
+    return response;
+  }
+
   public static List<FinishingType> findAll(Connection connection)
       throws SQLException {
     List<FinishingType> response = new ArrayList<>();

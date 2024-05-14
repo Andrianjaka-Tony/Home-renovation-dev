@@ -310,12 +310,18 @@ CREATE VIEW _v_client_contract_total_price AS
     _v_main_client_contract;
 
 
-CREATE VIEW s AS
+CREATE VIEW _v_client_contract_month_year AS
   SELECT
     DISTINCT TO_CHAR(_date, 'YYYY-MM') AS _month_year
   FROM
     _client_contract
     ORDER BY _month_year ASC;
+CREATE VIEW _v_client_contract_year AS
+  SELECT
+    DISTINCT TO_CHAR(_date, 'YYYY') AS _year
+  FROM
+    _client_contract
+    ORDER BY _year;
 
 
 CREATE VIEW _v_client_contract_amount_month_year AS

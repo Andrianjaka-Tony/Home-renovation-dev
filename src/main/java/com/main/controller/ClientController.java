@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.main.exception.PaymentException;
 import com.main.helper.Connect;
 import com.main.util.Response;
 
@@ -68,6 +69,10 @@ public class ClientController {
       client.payment(connection, payment);
       connection.commit();
       Response response = new Response(200, "Sign-in Success");
+      return response;
+    } catch (PaymentException e) {
+      Connect.rollback(connection);
+      Response response = new Response(201, e.getMessage());
       return response;
     } catch (Exception e) {
       Connect.rollback(connection);

@@ -58,6 +58,18 @@ public class ClientPayment {
     statement.close();
   }
 
+  public void saveFromCSV(Connection connection)
+      throws SQLException {
+    String sql = "INSERT INTO _client_payment (_id, _amount, _date, _contract) VALUES (?, ?, ?, ?)";
+    PreparedStatement statement = connection.prepareStatement(sql);
+    statement.setString(1, getId());
+    statement.setDouble(2, getAmount());
+    statement.setDate(3, getDate());
+    statement.setString(4, getContract().getId());
+    statement.execute();
+    statement.close();
+  }
+
   public void update(Connection connection)
       throws SQLException {
     String sql = "UPDATE _client_payment SET _amount = ?, _date = ?, _contract = ? WHERE _id = ?";
@@ -121,6 +133,30 @@ public class ClientPayment {
     while (resultSet.next()) {
       ClientPayment clientpayment = createFromResultSet(connection, resultSet);
       response.add(clientpayment);
+    }
+    statement.close();
+    resultSet.close();
+    return response;
+  }
+
+  // public static Double totalPayment(Connection connection) throws SQLException
+  // {
+  // Double response = 0.0;
+  // List<ClientPayment> payments = findAll(connection);
+  // for (ClientPayment payment : payments) {
+  // response += payment.amount;
+  // }
+  // return response;
+  // }
+
+  public static Double totalPayment(Connection connection)
+      throws SQLException {
+    Double response = null;
+    String sql = "SELECT _amount FROM _v_client_payment_total";
+    PreparedStatement statement = connection.prepareStatement(sql);
+    ResultSet resultSet = statement.executeQuery();
+    while (resultSet.next()) {
+      response = resultSet.getDouble("_amount");
     }
     statement.close();
     resultSet.close();

@@ -24,6 +24,7 @@ public class House {
   private String name;
   private String description;
   private Double duration;
+  private Double area;
   private Double price;
   private List<HouseDetails> details;
 
@@ -89,6 +90,7 @@ public class House {
     house.setDescription(resultSet.getString("_description"));
     house.setDuration(resultSet.getDouble("_duration"));
     house.setPrice(resultSet.getDouble("_price"));
+    house.setArea(resultSet.getDouble("_area"));
 
     return house;
   }

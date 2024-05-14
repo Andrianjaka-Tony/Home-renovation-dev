@@ -14,6 +14,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import com.main.exception.ClientException;
+import com.main.exception.PaymentException;
 import com.main.helper.Connect;
 
 @Data
@@ -168,6 +169,18 @@ public class Client {
     }
   }
 
+  public void beginContractCSV(Connection connection, ClientContract contract)
+      throws SQLException, ClientException {
+    setId(Client.findByContact(connection, getContact()).getId());
+    contract.setClient(this);
+    contract.saveFromCSV(connection);
+    for (HouseDetails detail : HouseDetails.findAllByHouse(connection, contract.getHouse())) {
+      ContractDetails contractDetails = new ContractDetails(null, detail.getQuantity(), detail.getWork().getPrice(),
+          detail.getWork(), contract, null);
+      contractDetails.save(connection);
+    }
+  }
+
   public void payment(Connection connection, ClientContract contract, Double amount, Date date)
       throws SQLException {
     ClientPayment payment = new ClientPayment();
@@ -178,13 +191,19 @@ public class Client {
   }
 
   public void payment(Connection connection, ClientPayment payment)
-      throws SQLException {
+      throws SQLException, PaymentException {
+    ClientContract contract = ClientContract.findById(connection, payment.getContract().getId());
+    if (contract.getPrice() < contract.getPayed() + payment.getAmount()) {
+      throw new PaymentException("Le montant que vous payez est superieur au prix du devis.");
+    }
     payment.save(connection);
   }
 
   public String signIn(Connection connection)
-      throws SQLException, ClientException {
-    if (Client.findByContact(connection, getContact()) == null) {
+      throws SQLException {
+    try {
+      Client.findByContact(connection, getContact());
+    } catch (Exception e) {
       Connect.startTransaction(connection);
       setName("Hello world");
       save(connection);

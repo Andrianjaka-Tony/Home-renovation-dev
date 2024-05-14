@@ -34,6 +34,7 @@ public class ClientContract {
   private Double finishingAugmentation;
   private Double price;
   private Double payed;
+  private Location location;
   private List<ContractDetails> details;
 
   public String nextId(Connection connection)
@@ -63,7 +64,7 @@ public class ClientContract {
     setEnd(Connect.add(connection, getBegin(), getHouse().getDuration()));
     setDate(new Date(new java.util.Date(System.currentTimeMillis()).getTime()));
 
-    String sql = "INSERT INTO _client_contract (_id, _begin, _end, _date, _client, _house, _finishing_type, _finishing_augmentation) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    String sql = "INSERT INTO _client_contract (_id, _begin, _end, _date, _client, _house, _finishing_type, _finishing_augmentation, _location) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     PreparedStatement statement = connection.prepareStatement(sql);
     statement.setString(1, getId());
     statement.setTimestamp(2, getBegin());
@@ -73,6 +74,29 @@ public class ClientContract {
     statement.setString(6, getHouse().getId());
     statement.setString(7, getFinishingType().getId());
     statement.setDouble(8, getFinishingType().getAugmentation());
+    statement.setString(9, getLocation().getId());
+    statement.execute();
+    statement.close();
+  }
+
+  public void saveFromCSV(Connection connection)
+      throws SQLException {
+    setHouse(House.findById(connection, getHouse().getId()));
+    setFinishingType(FinishingType.findById(connection, getFinishingType().getId()));
+    setEnd(Connect.add(connection, getBegin(), getHouse().getDuration()));
+    setDate(new Date(new java.util.Date(System.currentTimeMillis()).getTime()));
+
+    String sql = "INSERT INTO _client_contract (_id, _begin, _end, _date, _client, _house, _finishing_type, _finishing_augmentation, _location) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    PreparedStatement statement = connection.prepareStatement(sql);
+    statement.setString(1, getId());
+    statement.setTimestamp(2, getBegin());
+    statement.setTimestamp(3, getEnd());
+    statement.setDate(4, getDate());
+    statement.setString(5, getClient().getId());
+    statement.setString(6, getHouse().getId());
+    statement.setString(7, getFinishingType().getId());
+    statement.setDouble(8, getFinishingAugmentation());
+    statement.setString(9, getLocation().getId());
     statement.execute();
     statement.close();
   }
@@ -131,6 +155,11 @@ public class ClientContract {
     finishingType.setName(resultSet.getString("_finishing_type_name"));
     finishingType.setAugmentation(resultSet.getDouble("_finishing_type_augmentation"));
     clientcontract.setFinishingType(finishingType);
+
+    Location location = new Location();
+    location.setId((resultSet.getString("_location_id")));
+    location.setName((resultSet.getString("_location_name")));
+    clientcontract.setLocation(location);
 
     return clientcontract;
   }

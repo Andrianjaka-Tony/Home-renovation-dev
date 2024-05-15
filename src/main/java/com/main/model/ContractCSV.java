@@ -149,6 +149,18 @@ public class ContractCSV {
     }
   }
 
+  public void saveFinishing(Connection connection)
+      throws SQLException {
+    FinishingType finishingType = FinishingType.findByName(connection, getFinishingName());
+    if (finishingType == null) {
+      finishingType = FinishingType.builder()
+          .name(getFinishingName())
+          .augmentation(parseDouble(getAugmentation()))
+          .build();
+      finishingType.save(connection);
+    }
+  }
+
   public void saveContract(Connection connection)
       throws SQLException, ClientException {
     ClientContract contract = ClientContract.builder()

@@ -27,6 +27,8 @@ public class Work {
   private Work parent;
   @Builder.Default
   private boolean isPasses = false;
+  @Builder.Default
+  private List<Work> children = new ArrayList<>();
 
   public String nextId(Connection connection)
       throws SQLException {
@@ -205,6 +207,22 @@ public class Work {
     ResultSet resultSet = statement.executeQuery();
     while (resultSet.next()) {
       response = createFromResultSet(connection, resultSet);
+    }
+    statement.close();
+    resultSet.close();
+    return response;
+  }
+
+  public List<Work> findChildren(Connection connection)
+      throws SQLException {
+    List<Work> response = new ArrayList<>();
+    String sql = "SELECT * FROM _v_main_work WHERE _parent = ?";
+    PreparedStatement statement = connection.prepareStatement(sql);
+    statement.setString(1, getId());
+    ResultSet resultSet = statement.executeQuery();
+    while (resultSet.next()) {
+      Work work = createFromResultSet(connection, resultSet);
+      response.add(work);
     }
     statement.close();
     resultSet.close();

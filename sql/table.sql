@@ -88,7 +88,7 @@ VALUES
 ('F01', 'Standard', 0),
 ('F02', 'VIP', 10),
 ('F03', 'Gold', 20),
-('F04', 'Prenium', 40);
+('F04', 'Premium', 40);
 
 
 CREATE TABLE _work (

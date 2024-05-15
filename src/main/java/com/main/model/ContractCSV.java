@@ -165,6 +165,7 @@ public class ContractCSV {
       throws SQLException, ClientException {
     ClientContract contract = ClientContract.builder()
         .id(getId())
+        .date(Connect.convertToSqlDate(getDate()))
         .begin(Connect.convertToSqlTimestamp(getBegin()))
         .client(Client.findByContactWithoutException(connection, getClient()))
         .house(House.findByName(connection, getHouse()))
@@ -177,6 +178,7 @@ public class ContractCSV {
 
   public void process(Connection connection)
       throws SQLException, ClientException {
+    saveFinishing(connection);
     saveClient(connection);
     saveLocation(connection);
     saveContract(connection);

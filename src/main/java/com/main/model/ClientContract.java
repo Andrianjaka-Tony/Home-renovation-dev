@@ -87,7 +87,7 @@ public class ClientContract {
     setHouse(House.findById(connection, getHouse().getId()));
     setFinishingType(FinishingType.findById(connection, getFinishingType().getId()));
     setEnd(Connect.add(connection, getBegin(), getHouse().getDuration()));
-    setDate(new Date(new java.util.Date(System.currentTimeMillis()).getTime()));
+    // setDate(new Date(new java.util.Date(System.currentTimeMillis()).getTime()));
 
     String sql = "INSERT INTO _client_contract (_id, _begin, _end, _date, _client, _house, _finishing_type, _finishing_augmentation, _location) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     PreparedStatement statement = connection.prepareStatement(sql);

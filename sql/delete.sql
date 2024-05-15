@@ -11,3 +11,4 @@ DELETE FROM _house;
 DELETE FROM _client;
 DELETE FROM _unit;
 DELETE FROM _location;
+DELETE FROM _finishing_type;

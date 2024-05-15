@@ -87,13 +87,15 @@ public class PaymentTemp {
 
   public void savePayment(Connection connection)
       throws SQLException {
-    ClientPayment payment = ClientPayment.builder()
-        .id(getPayment())
-        .contract(ClientContract.findById(connection, getContract()))
-        .date(Connect.convertToSqlDate(getDate()))
-        .amount(getAmount())
-        .build();
-    payment.saveFromCSV(connection);
+    if (ClientPayment.findById(connection, getPayment()) == null) {
+      ClientPayment payment = ClientPayment.builder()
+          .id(getPayment())
+          .contract(ClientContract.findById(connection, getContract()))
+          .date(Connect.convertToSqlDate(getDate()))
+          .amount(getAmount())
+          .build();
+      payment.saveFromCSV(connection);
+    }
   }
 
   public static void save(Connection connection, String filePath)

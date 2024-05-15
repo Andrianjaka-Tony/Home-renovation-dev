@@ -176,6 +176,7 @@ public class ClientContract {
     ResultSet resultSet = statement.executeQuery();
     while (resultSet.next()) {
       ClientContract clientcontract = createFromResultSet(connection, resultSet);
+      clientcontract.setPayments(ClientPayment.findAllByContract(connection, clientcontract));
       response = clientcontract;
     }
     statement.close();

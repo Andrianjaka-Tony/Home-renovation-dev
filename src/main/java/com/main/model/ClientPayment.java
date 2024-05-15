@@ -142,7 +142,7 @@ public class ClientPayment {
   public static List<ClientPayment> findAllByContract(Connection connection, ClientContract contract)
       throws SQLException {
     List<ClientPayment> response = new ArrayList<>();
-    String sql = "SELECT * FROM _v_main_client_payment WHERE _contract = ?";
+    String sql = "SELECT * FROM _v_main_client_payment WHERE _contract = ? ORDER BY _date ASC";
     PreparedStatement statement = connection.prepareStatement(sql);
     statement.setString(1, contract.getId());
     ResultSet resultSet = statement.executeQuery();

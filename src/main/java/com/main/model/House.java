@@ -50,12 +50,13 @@ public class House {
   public void save(Connection connection)
       throws SQLException {
     setId(nextId(connection));
-    String sql = "INSERT INTO _house (_id, _name, _description, _duration) VALUES (?, ?, ?, ?)";
+    String sql = "INSERT INTO _house (_id, _name, _description, _duration, _area) VALUES (?, ?, ?, ?, ?)";
     PreparedStatement statement = connection.prepareStatement(sql);
     statement.setString(1, getId());
     statement.setString(2, getName());
     statement.setString(3, getDescription());
     statement.setDouble(4, getDuration());
+    statement.setDouble(5, getArea());
     statement.execute();
     statement.close();
   }

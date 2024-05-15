@@ -76,6 +76,7 @@ public class AdminController {
       Connect.startTransaction(connection);
       data.process(connection);
       connection.commit();
+      data.deleteTempDatas(connection);
       return response;
     } catch (Exception e) {
       e.printStackTrace();
@@ -95,6 +96,7 @@ public class AdminController {
       Connect.startTransaction(connection);
       data.importPayment(connection);
       connection.commit();
+      data.deleteTempDatas(connection);
       return response;
     } catch (Exception e) {
       e.printStackTrace();

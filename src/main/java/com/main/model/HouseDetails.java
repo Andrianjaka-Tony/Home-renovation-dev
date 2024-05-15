@@ -69,6 +69,16 @@ public class HouseDetails {
     statement.close();
   }
 
+  public void updateQuantity(Connection connection)
+      throws SQLException {
+    String sql = "UPDATE _house_details SET _quantity = ? WHERE _id = ?";
+    PreparedStatement statement = connection.prepareStatement(sql);
+    statement.setDouble(1, getQuantity());
+    statement.setString(2, getId());
+    statement.execute();
+    statement.close();
+  }
+
   public static void delete(Connection connection, String id)
       throws SQLException {
     String sql = "DELETE FROM _house_details WHERE _id = ?";
@@ -106,6 +116,23 @@ public class HouseDetails {
     String sql = "SELECT * FROM _v_main_house_details WHERE _id = ?";
     PreparedStatement statement = connection.prepareStatement(sql);
     statement.setString(1, id);
+    ResultSet resultSet = statement.executeQuery();
+    while (resultSet.next()) {
+      HouseDetails housedetails = createFromResultSet(connection, resultSet);
+      response = housedetails;
+    }
+    statement.close();
+    resultSet.close();
+    return response;
+  }
+
+  public static HouseDetails findByHouseAndWork(Connection connection, House house, Work work)
+      throws SQLException {
+    HouseDetails response = null;
+    String sql = "SELECT * FROM _v_main_house_details WHERE _house = ? AND _work = ?";
+    PreparedStatement statement = connection.prepareStatement(sql);
+    statement.setString(1, house.getId());
+    statement.setString(2, work.getId());
     ResultSet resultSet = statement.executeQuery();
     while (resultSet.next()) {
       HouseDetails housedetails = createFromResultSet(connection, resultSet);

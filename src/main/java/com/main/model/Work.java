@@ -25,6 +25,8 @@ public class Work {
   private Double price;
   private Unit unit;
   private Work parent;
+  @Builder.Default
+  private boolean isPasses = false;
 
   public String nextId(Connection connection)
       throws SQLException {
@@ -185,6 +187,24 @@ public class Work {
     while (resultSet.next()) {
       Work work = createFromResultSet(connection, resultSet);
       response.add(work);
+    }
+    statement.close();
+    resultSet.close();
+    return response;
+  }
+
+  public Work findParent(Connection connection)
+      throws SQLException {
+    if (getParent() == null) {
+      return null;
+    }
+    Work response = null;
+    String sql = "SELECT * FROM _v_main_work WHERE _id = ?";
+    PreparedStatement statement = connection.prepareStatement(sql);
+    statement.setString(1, getParent().getId());
+    ResultSet resultSet = statement.executeQuery();
+    while (resultSet.next()) {
+      response = createFromResultSet(connection, resultSet);
     }
     statement.close();
     resultSet.close();

@@ -35,7 +35,10 @@ public class ClientContract {
   private Double price;
   private Double payed;
   private Location location;
-  private List<ContractDetails> details;
+  @Builder.Default
+  private List<ContractDetails> details = new ArrayList<>();
+  @Builder.Default
+  private List<ClientPayment> payments = new ArrayList<>();
 
   public String nextId(Connection connection)
       throws SQLException {
